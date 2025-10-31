@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: ootd-assistant
+    name: ootd-system
     env: python
     region: oregon
     plan: free
