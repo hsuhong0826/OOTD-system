@@ -1,0 +1,5 @@
+gradio==4.20.0
+requests==2.31.0
+APScheduler==3.10.4
+huggingface-hub<1.0.0
+python-dotenv==1.0.0
