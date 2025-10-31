@@ -1751,14 +1751,20 @@ def create_gradio_app():
 # ==================== 啟動應用程式 ====================
 
 if __name__ == "__main__":
-    # 啟動 Gradio app
+    # 建立 Gradio app
     gradio_app = create_gradio_app()
 
-    # 加入 ping 端點到 Gradio 的 FastAPI app
-    @gradio_app.app.get("/ping")
-    def ping():
-        return {"message": "pong"}
+    # 在 launch 之前加入自訂路由到底層的 FastAPI app
+    from fastapi.responses import JSONResponse
 
+    # 取得 Gradio 內部的 FastAPI 實例
+    app = gradio_app.app
+
+    @app.get("/ping")
+    async def ping():
+        return JSONResponse(content={"message": "pong"})
+
+    # 啟動應用程式
     gradio_app.launch(
         server_name="0.0.0.0", server_port=7860, share=True, show_error=True
     )
