@@ -13,6 +13,7 @@ import weather as wt
 import email_notifier as em
 from apscheduler.schedulers.background import BackgroundScheduler
 import json
+from flask import Flask
 
 # 載入環境變數 (僅在本地開發時需要)
 if Path(".env").exists():
@@ -29,6 +30,15 @@ current_user = {"id": None, "username": None}
 # 初始化排程器
 scheduler = BackgroundScheduler()
 scheduler.start()
+
+# 建立 Flask app 用於健康檢查
+flask_app = Flask(__name__)
+
+
+@flask_app.route("/ping")
+def ping():
+    return "pong"
+
 
 # ==================== 登入/註冊功能 ====================
 
@@ -1750,6 +1760,10 @@ def create_gradio_app():
 # ==================== 啟動應用程式 ====================
 
 if __name__ == "__main__":
-    app = create_gradio_app()
+    gradio_app = create_gradio_app()
 
-    app.launch(server_name="0.0.0.0", server_port=7860, share=True, show_error=True)
+    # 將 Gradio app 掛載到 Flask
+    gradio_app_with_flask = gr.mount_gradio_app(flask_app, gradio_app, path="/")
+
+    # 啟動 Flask app
+    gradio_app_with_flask.run(host="0.0.0.0", port=7860, debug=False)
