@@ -866,7 +866,7 @@ def create_gradio_app():
                 reg_email = gr.Textbox(
                     label="Email（可選）", placeholder="example@email.com"
                 )
-                gr.Markdown("*綁定 Email 後可接收每日穿搭通知*")
+                gr.Markdown("綁定 Email 後可接收每日穿搭通知")
                 reg_btn = gr.Button("註冊", variant="primary")
                 reg_msg = gr.Textbox(label="訊息", interactive=False)
 
