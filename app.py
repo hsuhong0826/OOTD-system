@@ -1751,23 +1751,26 @@ def create_gradio_app():
 # ==================== 啟動應用程式 ====================
 
 if __name__ == "__main__":
+    import uvicorn
+    from fastapi import FastAPI
     from fastapi.responses import JSONResponse
-    
+
+    # 建立獨立的 FastAPI app
+    app = FastAPI()
+
     # 建立 Gradio app
     gradio_app = create_gradio_app()
 
-    # 取得 Gradio 內部的 FastAPI 實例
-    app = gradio_app.app
-
-    # 自訂 /ping 路由 (必須在 launch 之前註冊)
+    # 添加 /ping 路由
     @app.get("/ping")
     async def ping():
-        return JSONResponse({"status": "ok", "message": "pong"})
+        return {"status": "ok", "message": "pong"}
+
+    # 將 Gradio 掛載到 FastAPI
+    app = gr.mount_gradio_app(app, gradio_app, path="/")
 
     # 改用 Render 指定的 PORT（環境變數）
     port = int(os.environ.get("PORT", 7860))
 
-    # 啟動 Gradio，關閉 share 模式
-    gradio_app.launch(
-        server_name="0.0.0.0", server_port=port, share=False, show_error=True
-    )
+    # 使用 uvicorn 啟動
+    uvicorn.run(app, host="0.0.0.0", port=port)
