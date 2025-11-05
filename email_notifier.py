@@ -75,16 +75,29 @@ def send_outfit_email(
         message.attach(part2)
 
         # 連接 SMTP 伺服器並寄送 (設定逾時 30 秒)
+        print(f"嘗試連接到 {smtp_server}:{smtp_port}...")
         with smtplib.SMTP(smtp_server, smtp_port, timeout=30) as server:
+            print("開始 TLS 加密...")
             server.starttls()
+            print(f"使用帳號 {sender_email} 登入...")
             server.login(sender_email, sender_password)
+            print("發送郵件...")
             server.send_message(message)
 
-        print(f"Email 已成功寄送至 {to_email}")
+        print(f"✅ Email 已成功寄送至 {to_email}")
         return True
 
+    except smtplib.SMTPAuthenticationError as e:
+        error_msg = f"SMTP 認證失敗：請檢查 Email 和應用程式密碼是否正確 - {str(e)}"
+        print(f"❌ {error_msg}")
+        return False
+    except smtplib.SMTPException as e:
+        error_msg = f"SMTP 錯誤：{str(e)}"
+        print(f"❌ {error_msg}")
+        return False
     except Exception as e:
-        print(f"Email 寄送失敗：{e}")
+        error_msg = f"Email 寄送失敗：{str(e)}"
+        print(f"❌ {error_msg}")
         return False
 
 

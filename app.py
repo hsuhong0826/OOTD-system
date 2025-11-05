@@ -788,6 +788,13 @@ def send_test_email():
     try:
         user_id = get_current_user_id()
 
+        # 檢查環境變數
+        smtp_email = os.environ.get("SMTP_EMAIL", "")
+        smtp_password = os.environ.get("SMTP_PASSWORD", "")
+
+        if not smtp_email or not smtp_password:
+            return "❌ 未設定 SMTP 環境變數（SMTP_EMAIL 和 SMTP_PASSWORD）\n請在 Render 的 Environment Variables 中設定：\n- SMTP_EMAIL: 你的 Gmail 地址\n- SMTP_PASSWORD: Gmail 應用程式密碼"
+
         # 取得用戶 Email
         email, _, enabled = db.get_user_email_settings(user_id)
 
@@ -811,12 +818,13 @@ def send_test_email():
         weather_info = weather_data[0] if weather_data else None
 
         # 發送 Email
+        print(f"準備發送測試郵件到 {email}...")
         success = em.send_outfit_email(email, outfit_items, weather_info)
 
         if success:
             return f"✅ 測試郵件已發送至 {email}"
         else:
-            return "❌ 郵件發送失敗（請檢查 SMTP 設定）"
+            return f"❌ 郵件發送失敗\n\n請確認：\n1. SMTP_EMAIL 和 SMTP_PASSWORD 環境變數已在 Render 設定\n2. SMTP_PASSWORD 使用 Gmail 應用程式密碼（非帳號密碼）\n3. Gmail 帳戶已啟用「兩步驟驗證」\n\n發送帳號：{smtp_email}"
     except ValueError as e:
         return str(e)
     except Exception as e:
