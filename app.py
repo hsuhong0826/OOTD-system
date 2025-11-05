@@ -1751,19 +1751,18 @@ def create_gradio_app():
 # ==================== 啟動應用程式 ====================
 
 if __name__ == "__main__":
+    from fastapi.responses import JSONResponse
+    
     # 建立 Gradio app
     gradio_app = create_gradio_app()
-
-    # 在 launch 之前加入自訂路由到底層的 FastAPI app
-    from fastapi.responses import JSONResponse
 
     # 取得 Gradio 內部的 FastAPI 實例
     app = gradio_app.app
 
-    # 自訂 /ping 路由
+    # 自訂 /ping 路由 (必須在 launch 之前註冊)
     @app.get("/ping")
     async def ping():
-        return JSONResponse(content={"message": "pong"})
+        return JSONResponse({"status": "ok", "message": "pong"})
 
     # 改用 Render 指定的 PORT（環境變數）
     port = int(os.environ.get("PORT", 7860))
