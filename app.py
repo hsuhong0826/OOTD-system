@@ -1760,11 +1760,15 @@ if __name__ == "__main__":
     # 取得 Gradio 內部的 FastAPI 實例
     app = gradio_app.app
 
+    # 自訂 /ping 路由
     @app.get("/ping")
     async def ping():
         return JSONResponse(content={"message": "pong"})
 
-    # 啟動應用程式
+    # 改用 Render 指定的 PORT（環境變數）
+    port = int(os.environ.get("PORT", 7860))
+
+    # 啟動 Gradio，關閉 share 模式
     gradio_app.launch(
-        server_name="0.0.0.0", server_port=7860, share=True, show_error=True
+        server_name="0.0.0.0", server_port=port, share=False, show_error=True
     )
